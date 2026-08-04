@@ -75,7 +75,7 @@
   pointer-events: none;
 }
 
-/* Eye icon overlay — centered on blurred content */
+/* Eye icon overlay — centered on blurred/revealed content */
 .reveal-overlay {
   position: absolute;
   inset: 0;
@@ -89,11 +89,22 @@
   width: 28px;
   height: 28px;
   color: rgba(255, 255, 255, 0.4);
-  transition: color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
-.result-content-wrapper.blurred:hover .eye-icon {
+.result-content-wrapper:hover .eye-icon {
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* Blur-hint (eye-open icon when revealed) — hidden by default, shown on hover */
+.eye-icon.blur-hint {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.result-content-wrapper.revealed:hover .eye-icon.blur-hint {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* Actions */
