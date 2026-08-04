@@ -1,17 +1,29 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import CameraScanner from './components/CameraScanner';
 import PasteScanner from './components/PasteScanner';
 import UploadScanner from './components/UploadScanner';
 
 const TABS = [
-  { id: 'camera', label: '📸 Camera', Component: CameraScanner },
+  { id: 'paste', label: '📋 From Clipboard', Component: PasteScanner },
   { id: 'upload', label: '🖼️ Upload', Component: UploadScanner },
-  { id: 'paste',  label: '📋 From Clipboard',  Component: PasteScanner },
+  { id: 'camera', label: '📸 Camera', Component: CameraScanner },
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('camera');
+  const [activeTab, setActiveTab] = useState('paste');
+  const [pasteEvent, setPasteEvent] = useState(null);
+
+  const handleGlobalPaste = useCallback((e) => {
+    // Switch to paste tab and forward event
+    setActiveTab('paste');
+    setPasteEvent(e);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('paste', handleGlobalPaste);
+    return () => document.removeEventListener('paste', handleGlobalPaste);
+  }, [handleGlobalPaste]);
 
   return (
     <div className="container">
@@ -33,7 +45,7 @@ export default function App() {
       <div className="tab-content active">
         {TABS.map(({ id, Component }) => (
           <div key={id} style={{ display: activeTab === id ? 'block' : 'none' }}>
-            <Component />
+            <Component pasteEvent={id === 'paste' ? pasteEvent : null} onPasteConsumed={() => setPasteEvent(null)} />
           </div>
         ))}
       </div>

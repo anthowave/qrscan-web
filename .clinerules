@@ -1,25 +1,26 @@
 # qrscan-web — Memory Bank
 
 ## Overview
-Privacy-first QR code scanner web app. Decode QR codes from camera, image files, or clipboard — with blurred results requiring explicit user action to reveal. Built with React + Vite + html5-qrcode.
+Privacy-first QR code scanner PWA. Decode QR codes from clipboard, image files, or camera — with blurred results requiring explicit user action to reveal. Built with React + Vite + html5-qrcode + vite-plugin-pwa.
 
 ## Tech Stack
 - **React 19** with Vite 8 (HMR dev server on `:5173`)
 - **html5-qrcode** npm package (v2.x, `import { Html5Qrcode } from 'html5-qrcode'`)
+- **vite-plugin-pwa** — PWA with `display: standalone`, auto-update SW, Workbox
 - Plain CSS (no framework), CSS variables for theming
-- Build output: `dist/` (566KB JS gzipped to ~170KB)
+- Build output: `dist/` (includes SW + manifest + PWA icons)
 
 ## Architecture
 ```
 src/
-├── App.jsx              → Tab layout (Camera / Upload / Paste) with useState for active tab
+├── App.jsx              → Tab layout (From Clipboard / Upload / Camera) with global document paste listener
 ├── App.css              → Layout, tabs, container styling
 ├── index.css            → CSS variables, global reset, dark theme
-├── main.jsx             → ReactDOM.createRoot entry point
+├── main.jsx             → ReactDOM.createRoot + PWA SW registration
 └── components/
-    ├── CameraScanner.jsx/css   → Live camera via Html5Qrcode instance on #reader div
+    ├── PasteScanner.jsx/css    → Clipboard-first: global paste listener, visibilitychange auto-read, click-to-read
     ├── UploadScanner.jsx/css   → File input + drag-drop, uses Html5Qrcode on #file-scanner-helper
-    ├── PasteScanner.jsx/css    → Clipboard paste listener, converts Blob→File, blurred thumbnail
+    ├── CameraScanner.jsx/css   → Live camera via Html5Qrcode instance on #reader div
     └── ResultBox.jsx/css       → Shared result display with privacy toggle and clipboard expiry
 ```
 
@@ -41,6 +42,10 @@ src/
 - Clipboard getAsFile() returns nameless Blob → wrap in new File([blob], 'screenshot.png', {type}) for format detection
 - ResultBox resets revealed=false on new content via useEffect dependency on content
 - Eye icon toggle uses position: absolute; inset: 0 overlay with pointer-events: none
+- PWA `display: standalone` — opens in dedicated window, Alt+Tab-able like native app
+- Global document paste listener in App.jsx — paste anywhere, not just inside paste zone
+- visibilitychange auto-reads clipboard when returning to PWA (if clipboard-read permission granted)
+- Click on paste zone triggers clipboard.read() for user activation gating
 
 ## Git Conventions
 - Conventional Commits: feat(scope):, fix(scope):, style(scope):, docs:, chore:
