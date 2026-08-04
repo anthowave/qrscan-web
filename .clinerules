@@ -21,7 +21,7 @@ src/
     ├── PasteScanner.jsx/css    → Clipboard-first: global paste listener, visibilitychange auto-read, click-to-read with permission prompt
     ├── UploadScanner.jsx/css   → File input + drag-drop, uses Html5Qrcode on #file-scanner-helper
     ├── CameraScanner.jsx/css   → Live camera via Html5Qrcode instance on #reader div
-    └── ResultBox.jsx/css       → Shared result display with privacy toggle and clipboard expiry
+     └── ResultBox.jsx/css       → Shared result display with privacy toggle, clipboard expiry, and smart content-type insight pill
 ```
 
 ## Theme: Minimalist Swiss/Linear
@@ -35,6 +35,7 @@ src/
 3. **Copy button always visible** — works even while blurred
 4. **Clipboard auto-expiry** — clears clipboard after 2 minutes
 5. **Pasted thumbnails blurred** — filter: blur(3px) + 60% opacity
+6. **Smart content-type insight pill** — before reveal, shows what's detected (URL, TOTP, Wi-Fi, vCard, email, phone, JSON, hex, Base64, number, English text)
 
 ## Key Design Decisions
 - Html5Qrcode needs a real DOM element ID (hidden #file-scanner-helper div in index.html)
@@ -42,6 +43,8 @@ src/
 - Clipboard getAsFile() returns nameless Blob → wrap in new File([blob], 'screenshot.png', {type}) for format detection
 - ResultBox resets revealed=false on new content via useEffect dependency on content
 - Eye icon toggle uses position: absolute; inset: 0 overlay with pointer-events: none
+- detectContentType() in ResultBox.jsx analyzes decoded text via regex heuristics and returns a human-readable label
+- Insight pill rendered inside result-header flex row, pushed right via margin-left: auto, hidden when content is revealed
 - PWA `display: standalone` — opens in dedicated window, Alt+Tab-able like native app
 - Global document paste listener in App.jsx — paste anywhere, not just inside paste zone
 - visibilitychange auto-reads clipboard when returning to PWA (if clipboard-read permission granted)

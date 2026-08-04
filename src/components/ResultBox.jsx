@@ -1,5 +1,56 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './ResultBox.css';
+
+function detectContentType(text) {
+  if (!text || typeof text !== 'string') return null;
+
+  const trimmed = text.trim();
+
+  // URL
+  if (/^https?:\/\//i.test(trimmed)) return 'Detected a URL';
+
+  // OTP / TOTP
+  if (/^otpauth:\/\/totp\//i.test(trimmed)) return 'Detected 2FA code (TOTP)';
+
+  // Wi-Fi
+  if (/^WIFI:/i.test(trimmed)) return 'Detected Wi-Fi credentials';
+
+  // vCard
+  if (/^BEGIN:VCARD/i.test(trimmed)) return 'Detected a contact (vCard)';
+
+  // Email
+  if (/^mailto:/i.test(trimmed) || /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed)) {
+    return 'Detected an email address';
+  }
+
+  // Phone number (basic: + country code or all digits with common separators)
+  if (/^\+?[\d\s\-().]{7,20}$/.test(trimmed) && /\d/.test(trimmed)) return 'Detected a phone number';
+
+  // JSON
+  if (/^[\{\[]/.test(trimmed)) {
+    try { JSON.parse(trimmed); return 'Detected JSON data'; } catch { /* not valid JSON */ }
+  }
+
+  // Mostly hexadecimal (at least 4 hex chars, >80% hex)
+  const hexChars = trimmed.replace(/\s/g, '');
+  if (hexChars.length >= 4 && /^[0-9a-fA-F]+$/.test(hexChars) && hexChars.length > 8) {
+    return 'Detected a hex string';
+  }
+
+  // Base64 (alphanumeric + +/=, >60 chars, common pattern)
+  if (/^[A-Za-z0-9+/=]{60,}$/.test(trimmed.replace(/\s/g, ''))) return 'Detected Base64 data';
+
+  // All digits
+  if (/^\d+$/.test(trimmed)) return 'Detected a number';
+
+  // Mostly readable English text (>50% ASCII letters/spaces, at least 8 chars)
+  const alphaCount = (trimmed.match(/[a-zA-Z ]/g) || []).length;
+  if (trimmed.length >= 8 && alphaCount / trimmed.length > 0.5) {
+    return 'Detected English text';
+  }
+
+  return 'Detected mixed content';
+}
 
 export default function ResultBox({ visible, success, content, isLoading }) {
   const [revealed, setRevealed] = useState(false);
@@ -10,6 +61,8 @@ export default function ResultBox({ visible, success, content, isLoading }) {
       setRevealed(false);
     }
   }, [content, visible, success, isLoading]);
+
+  const insight = useMemo(() => detectContentType(content), [content]);
 
   if (!visible) return null;
 
@@ -26,6 +79,9 @@ export default function ResultBox({ visible, success, content, isLoading }) {
       <div className="result-header">
         <span className={`result-dot ${isLoading ? 'loading' : success ? 'success' : 'error'}`} />
         <span className="result-label">{label}</span>
+        {!isLoading && success && !revealed && insight && (
+          <span className="insight-pill">{insight}</span>
+        )}
       </div>
 
       <div

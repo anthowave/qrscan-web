@@ -17,6 +17,10 @@
   margin-bottom: 10px;
 }
 
+.result-header .result-label {
+  flex: 0 0 auto;
+}
+
 .result-dot {
   width: 6px;
   height: 6px;
@@ -43,6 +47,21 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Insight pill */
+.insight-pill {
+  margin-left: auto;
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px 8px;
+  letter-spacing: 0.01em;
+  opacity: 0.6;
 }
 
 /* Wrapper for content + overlay */
