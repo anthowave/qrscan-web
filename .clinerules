@@ -59,7 +59,11 @@ src/
 ## Git Conventions
 - Conventional Commits: feat(scope):, fix(scope):, style(scope):, docs:, chore:
 - Branch: main
-- Commit and push after meaningful fixes or features are completed (not after every single edit, but after a logical group of changes)
+- **Always commit and push after completing a task** — this is part of the definition of done. After any meaningful change, stage, commit with a conventional commit message, and push to origin/main.
+
+## Documentation
+- README.md is **UI/UX-focused** — describes features from the user's perspective, not code/tech details. Includes `screenshot.png`.
+- Technical/architecture details live in this memory bank (`.clinerules`), not in the README.
 
 ## Common Commands
 ```bash
