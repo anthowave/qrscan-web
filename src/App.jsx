@@ -7,7 +7,7 @@ import UploadScanner from './components/UploadScanner';
 const TABS = [
   { id: 'camera', label: '📸 Camera', Component: CameraScanner },
   { id: 'upload', label: '🖼️ Upload', Component: UploadScanner },
-  { id: 'paste',  label: '📋 Paste',  Component: PasteScanner },
+  { id: 'paste',  label: '📋 From Clipboard',  Component: PasteScanner },
 ];
 
 export default function App() {

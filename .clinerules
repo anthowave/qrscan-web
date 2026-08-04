@@ -45,6 +45,7 @@ src/
 ## Git Conventions
 - Conventional Commits: feat(scope):, fix(scope):, style(scope):, docs:, chore:
 - Branch: main
+- Commit and push after meaningful fixes or features are completed (not after every single edit, but after a logical group of changes)
 
 ## Common Commands
 ```bash
