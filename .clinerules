@@ -46,6 +46,7 @@ src/
 - Global document paste listener in App.jsx — paste anywhere, not just inside paste zone
 - visibilitychange auto-reads clipboard when returning to PWA (if clipboard-read permission granted)
 - Click on paste zone triggers clipboard.read() for user activation gating
+- Responsive layout: `min(100%, 480px)` container, `clamp()` padding, `100dvh` body, edge-to-edge at ≤480px
 
 ## Git Conventions
 - Conventional Commits: feat(scope):, fix(scope):, style(scope):, docs:, chore:
