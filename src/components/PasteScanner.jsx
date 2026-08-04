@@ -6,6 +6,7 @@ import ResultBox from './ResultBox';
 export default function PasteScanner({ pasteEvent, onPasteConsumed }) {
   const [pastedImage, setPastedImage] = useState(null);
   const [result, setResult] = useState({ visible: false, success: false, content: '', loading: false });
+  const [clipboardPerm, setClipboardPerm] = useState('unknown'); // 'granted' | 'prompt' | 'denied' | 'unknown'
   const pasteZoneRef = useRef(null);
 
   const decodeImage = useCallback((file) => {
@@ -72,57 +73,64 @@ export default function PasteScanner({ pasteEvent, onPasteConsumed }) {
     setResult({ visible: true, success: false, content: 'No image found in clipboard. Use Win+Shift+S / Cmd+Shift+4 to screenshot a QR code first.', loading: false });
   };
 
-  // Auto-detect clipboard image on page visibility change (user returned to the PWA)
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (document.hidden) return;
-      try {
-        const permission = await navigator.permissions.query({ name: 'clipboard-read' });
-        if (permission.state !== 'granted') return;
+  // Check and update clipboard-read permission state
+  const checkPermission = useCallback(() => {
+    navigator.permissions.query({ name: 'clipboard-read' }).then(perm => {
+      setClipboardPerm(perm.state);
+      perm.addEventListener('change', () => setClipboardPerm(perm.state));
+    }).catch(() => {
+      setClipboardPerm('unknown');
+    });
+  }, []);
 
-        const clipboardItems = await navigator.clipboard.read();
-        for (const clipboardItem of clipboardItems) {
-          for (const type of clipboardItem.types) {
-            if (type.startsWith('image/')) {
-              const blob = await clipboardItem.getType(type);
+  // Try reading clipboard image (used by click + mount + visibility)
+  const tryReadClipboard = useCallback(() => {
+    navigator.clipboard.read().then(clipboardItems => {
+      for (const clipboardItem of clipboardItems) {
+        for (const type of clipboardItem.types) {
+          if (type.startsWith('image/')) {
+            clipboardItem.getType(type).then(blob => {
               const ext = type.split('/')[1] || 'png';
               const file = new File([blob], `screenshot.${ext}`, { type });
               decodeImage(file);
-              return;
-            }
+            });
+            return;
           }
         }
-      } catch {
-        // Clipboard API not available or permission denied — user can still Ctrl+V
       }
+      // No image found in clipboard
+    }).catch(() => {
+      // Permission denied or clipboard empty — silently ignore
+    });
+  }, [decodeImage]);
+
+  // Check permission on mount
+  useEffect(() => {
+    checkPermission();
+  }, [checkPermission]);
+
+  // Initial clipboard read on mount
+  useEffect(() => {
+    tryReadClipboard();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-detect clipboard image on page visibility change (user returned to the PWA)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) return;
+      tryReadClipboard();
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [decodeImage]);
+  }, [tryReadClipboard]);
 
   // Trigger clipboard read on click (provides user activation for clipboard-read permission prompt)
   const handleClick = () => {
     pasteZoneRef.current.focus();
-    // If clipboard-read is already granted, try reading immediately
-    navigator.permissions.query({ name: 'clipboard-read' }).then(permission => {
-      if (permission.state === 'granted') {
-        navigator.clipboard.read().then(clipboardItems => {
-          for (const clipboardItem of clipboardItems) {
-            for (const type of clipboardItem.types) {
-              if (type.startsWith('image/')) {
-                clipboardItem.getType(type).then(blob => {
-                  const ext = type.split('/')[1] || 'png';
-                  const file = new File([blob], `screenshot.${ext}`, { type });
-                  decodeImage(file);
-                });
-                return;
-              }
-            }
-          }
-        }).catch(() => {});
-      }
-    }).catch(() => {});
+    tryReadClipboard();
+    // Re-check permission state after the attempt
+    setTimeout(checkPermission, 500);
   };
 
   return (
@@ -139,6 +147,11 @@ export default function PasteScanner({ pasteEvent, onPasteConsumed }) {
         <div className="paste-hint">
           Screenshot a QR code: <kbd>Win+Shift+S</kbd> (Windows) / <kbd>Cmd+Shift+4</kbd> (Mac), then <kbd>Ctrl+V</kbd>
         </div>
+        {clipboardPerm !== 'granted' && (
+          <div className="paste-permission-hint">
+            {clipboardPerm === 'prompt' ? '👆 Click to grant clipboard access' : '🔒 Clipboard access needed — click to enable'}
+          </div>
+        )}
       </div>
       {pastedImage && (
         <div className="pasted-image-wrapper">
