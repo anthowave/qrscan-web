@@ -1,0 +1,58 @@
+# qrscan-web — Memory Bank
+
+## Overview
+Privacy-first QR code scanner web app. Decode QR codes from camera, image files, or clipboard — with blurred results requiring explicit user action to reveal. Built with React + Vite + html5-qrcode.
+
+## Tech Stack
+- **React 19** with Vite 8 (HMR dev server on `:5173`)
+- **html5-qrcode** npm package (v2.x, `import { Html5Qrcode } from 'html5-qrcode'`)
+- Plain CSS (no framework), CSS variables for theming
+- Build output: `dist/` (566KB JS gzipped to ~170KB)
+
+## Architecture
+```
+src/
+├── App.jsx              → Tab layout (Camera / Upload / Paste) with useState for active tab
+├── App.css              → Layout, tabs, container styling
+├── index.css            → CSS variables, global reset, dark theme
+├── main.jsx             → ReactDOM.createRoot entry point
+└── components/
+    ├── CameraScanner.jsx/css   → Live camera via Html5Qrcode instance on #reader div
+    ├── UploadScanner.jsx/css   → File input + drag-drop, uses Html5Qrcode on #file-scanner-helper
+    ├── PasteScanner.jsx/css    → Clipboard paste listener, converts Blob→File, blurred thumbnail
+    └── ResultBox.jsx/css       → Shared result display with privacy toggle and clipboard expiry
+```
+
+## Theme: Minimalist Swiss/Linear
+- Pure black #000 background, #0d0d0d surface, subtle #1f1f1f borders
+- Fonts: Inter (sans-serif UI), JetBrains Mono (decoded content)
+- White accent buttons on black, secondary in grayscale
+
+## Privacy Features
+1. **Result content blurred by default** — filter: blur(6px), eye-off icon centered
+2. **Click to toggle reveal/blur** — eye-off ↔ eye icons, re-blur on click
+3. **Copy button always visible** — works even while blurred
+4. **Clipboard auto-expiry** — clears clipboard after 2 minutes
+5. **Pasted thumbnails blurred** — filter: blur(3px) + 60% opacity
+
+## Key Design Decisions
+- Html5Qrcode needs a real DOM element ID (hidden #file-scanner-helper div in index.html)
+- scanFile() is an instance method, NOT static — must call new Html5Qrcode('id') first
+- Clipboard getAsFile() returns nameless Blob → wrap in new File([blob], 'screenshot.png', {type}) for format detection
+- ResultBox resets revealed=false on new content via useEffect dependency on content
+- Eye icon toggle uses position: absolute; inset: 0 overlay with pointer-events: none
+
+## Git Conventions
+- Conventional Commits: feat(scope):, fix(scope):, style(scope):, docs:, chore:
+- Branch: main
+
+## Common Commands
+```bash
+npm run dev      # Start dev server at :5173
+npm run build    # Production build to dist/
+npx vite build   # Vite build (same as npm run build)
+```
+
+## Active State
+- Dev server runs at http://localhost:5173 (via npm run dev)
+- Vite HMR handles live reload
