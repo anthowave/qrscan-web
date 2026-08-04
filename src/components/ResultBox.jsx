@@ -1,35 +1,58 @@
 import { useState } from 'react';
 import './ResultBox.css';
 
-export default function ResultBox({ visible, success, content, onCopy }) {
-  if (!visible && !content) return null;
+export default function ResultBox({ visible, success, content, isLoading }) {
+  const [revealed, setRevealed] = useState(false);
 
-  const label = success ? '✅ Decoded Successfully' : '❌ Scan Failed';
-  const className = `result ${visible ? 'show' : ''} ${success ? 'success' : 'error'}`;
+  if (!visible) return null;
+
+  const label = isLoading
+    ? 'Scanning…'
+    : success
+      ? 'Decoded'
+      : 'Failed';
+
+  const className = `result ${visible ? 'show' : ''} ${success && !isLoading ? 'success' : ''} ${!success && !isLoading ? 'error' : ''}`;
 
   return (
     <div className={className}>
-      <div className="result-label">{label}</div>
-      <div className="result-content">{content || 'No result'}</div>
-      {content && (
-        <CopyButton text={content} />
+      <div className="result-header">
+        <span className={`result-dot ${isLoading ? 'loading' : success ? 'success' : 'error'}`} />
+        <span className="result-label">{label}</span>
+      </div>
+
+      <div className={`result-content ${!revealed ? 'blurred' : ''}`}>
+        {content || '—'}
+      </div>
+
+      {!isLoading && success && (
+        <div className="result-actions">
+          {!revealed ? (
+            <button className="reveal-btn" onClick={() => setRevealed(true)}>
+              Click to reveal
+            </button>
+          ) : (
+            <CopyButton text={content} onCopied={() => setRevealed(true)} />
+          )}
+        </div>
       )}
     </div>
   );
 }
 
-function CopyButton({ text }) {
+function CopyButton({ text, onCopied }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+    onCopied?.();
   };
 
   return (
     <button className="copy-btn" onClick={handleCopy}>
-      {copied ? '✅ Copied!' : '📋 Copy'}
+      {copied ? 'Copied' : 'Copy'}
     </button>
   );
 }

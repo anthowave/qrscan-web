@@ -1,16 +1,53 @@
-# React + Vite
+# QR Code Scanner
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A privacy-first QR code scanner for the web. Decode QR codes from your camera, image files, or clipboard — with blurred results that require a click to reveal.
 
-Currently, two official plugins are available:
+Built with **React + Vite** and the [html5-qrcode](https://github.com/mebjas/html5-qrcode) library.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **📸 Camera** — Live QR scanning using your device camera
+- **🖼️ Upload** — Drag & drop or click to upload an image file
+- **📋 Paste** — Paste a screenshot directly from your clipboard (Ctrl+V)
+- **🔒 Privacy-first** — Scanned content is blurred by default; click to reveal
+- **📋 Copy** — One-click copy decoded content to clipboard
+- **🎨 Minimal design** — Clean, dark theme built for developers
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the Oxlint configuration
+```bash
+# Install dependencies
+npm install
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+# Start dev server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+The dev server runs at `http://localhost:5173`.
+
+## Tech Stack
+
+- [React](https://react.dev) (Vite)
+- [html5-qrcode](https://github.com/mebjas/html5-qrcode) — QR code scanning library
+
+## Project Structure
+
+```
+src/
+├── App.jsx              # Tab layout (Camera / Upload / Paste)
+├── App.css
+├── index.css            # Global styles + CSS variables
+├── main.jsx             # React entry point
+└── components/
+    ├── CameraScanner.jsx/css   # Live camera scanning
+    ├── UploadScanner.jsx/css   # File upload & drag-drop
+    ├── PasteScanner.jsx/css    # Clipboard paste scanning
+    └── ResultBox.jsx/css       # Privacy-blurred result display
+```
+
+## License
+
+MIT

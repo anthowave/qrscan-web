@@ -1,57 +1,64 @@
 .container {
   width: 100%;
-  max-width: 600px;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 28px 32px 32px;
+}
+
+.header {
+  margin-bottom: 32px;
 }
 
 h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 600;
   text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.02em;
+  color: var(--text);
 }
 
 .subtitle {
   text-align: center;
-  color: #94a3b8;
-  font-size: 0.9rem;
-  margin-bottom: 28px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin-top: 6px;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .tabs {
   display: flex;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
-  padding: 4px;
-  margin-bottom: 24px;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 3px;
+  margin-bottom: 28px;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 10px 16px;
+  padding: 7px 12px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-muted);
   cursor: pointer;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+  letter-spacing: -0.01em;
 }
 
 .tab-btn.active {
-  background: #3b82f6;
-  color: #fff;
+  background: var(--border-hover);
+  color: var(--text);
 }
 
 .tab-btn:not(.active):hover {
-  color: #e2e8f0;
+  color: var(--text-secondary);
 }
 
 .tab-content {

@@ -5,23 +5,22 @@ import ResultBox from './ResultBox';
 
 export default function PasteScanner() {
   const [pastedImage, setPastedImage] = useState(null);
-  const [result, setResult] = useState({ visible: false, success: false, content: '' });
+  const [result, setResult] = useState({ visible: false, success: false, content: '', loading: false });
   const pasteZoneRef = useRef(null);
 
   const decodeImage = (file) => {
-    // Show small centered preview
     const url = URL.createObjectURL(file);
     setPastedImage(url);
 
-    setResult({ visible: true, success: true, content: 'Analyzing image, please wait...' });
+    setResult({ visible: true, success: true, content: 'Analyzing image…', loading: true });
 
     const scanner = new Html5Qrcode('file-scanner-helper');
     scanner.scanFile(file, true)
       .then(decodedText => {
-        setResult({ visible: true, success: true, content: decodedText });
+        setResult({ visible: true, success: true, content: decodedText, loading: false });
       })
       .catch(err => {
-        setResult({ visible: true, success: false, content: `No QR code found: ${err.message || err}` });
+        setResult({ visible: true, success: false, content: `No QR code found: ${err.message || err}`, loading: false });
       })
       .finally(() => scanner.clear());
   };
@@ -33,7 +32,7 @@ export default function PasteScanner() {
         e.preventDefault();
         const blob = item.getAsFile();
         if (!blob) {
-          setResult({ visible: true, success: false, content: 'Could not read image from clipboard.' });
+          setResult({ visible: true, success: false, content: 'Could not read image from clipboard.', loading: false });
           return;
         }
         const ext = item.type.split('/')[1] || 'png';
@@ -43,7 +42,7 @@ export default function PasteScanner() {
       }
     }
     e.preventDefault();
-    setResult({ visible: true, success: false, content: 'No image found in clipboard. Copy a screenshot and try again.' });
+    setResult({ visible: true, success: false, content: 'No image found in clipboard. Copy a screenshot and try again.', loading: false });
   };
 
   return (
@@ -65,7 +64,12 @@ export default function PasteScanner() {
           <img src={pastedImage} className="pasted-image" alt="QR code preview" />
         </div>
       )}
-      <ResultBox visible={result.visible} success={result.success} content={result.content} />
+      <ResultBox
+        visible={result.visible}
+        success={result.success}
+        content={result.content}
+        isLoading={result.loading}
+      />
     </div>
   );
 }
