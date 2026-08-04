@@ -18,7 +18,7 @@ src/
 ├── index.css            → CSS variables, global reset, dark theme
 ├── main.jsx             → ReactDOM.createRoot + PWA SW registration
 └── components/
-    ├── PasteScanner.jsx/css    → Clipboard-first: global paste listener, visibilitychange auto-read, click-to-read
+    ├── PasteScanner.jsx/css    → Clipboard-first: global paste listener, visibilitychange auto-read, click-to-read with permission prompt
     ├── UploadScanner.jsx/css   → File input + drag-drop, uses Html5Qrcode on #file-scanner-helper
     ├── CameraScanner.jsx/css   → Live camera via Html5Qrcode instance on #reader div
     └── ResultBox.jsx/css       → Shared result display with privacy toggle and clipboard expiry
@@ -45,7 +45,12 @@ src/
 - PWA `display: standalone` — opens in dedicated window, Alt+Tab-able like native app
 - Global document paste listener in App.jsx — paste anywhere, not just inside paste zone
 - visibilitychange auto-reads clipboard when returning to PWA (if clipboard-read permission granted)
-- Click on paste zone triggers clipboard.read() for user activation gating
+- Click on paste zone triggers navigator.clipboard.read() directly — browser handles permission prompt via user gesture
+- tryReadClipboard() helper encapsulates clipboard read logic, used by mount, visibilitychange, and click handlers
+- clipboardPerm state tracks permission status ('granted' | 'prompt' | 'denied' | 'unknown') with UX hint in paste zone
+- Initial clipboard read attempted on mount (fails silently if permission not granted — user can click to prompt)
+- HandleClick focuses paste zone then calls tryReadClipboard() + re-checks permission state after 500ms
+- decodeImage + processClipboardItem + tryReadClipboard + checkPermission declared as useCallback before useEffect hooks to avoid TDZ
 - Responsive layout: `min(100%, 480px)` container, `clamp()` padding, `100dvh` body, edge-to-edge at ≤480px
 
 ## Git Conventions
