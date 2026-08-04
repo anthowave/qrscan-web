@@ -27,12 +27,11 @@ export default function ResultBox({ visible, success, content, isLoading }) {
 
       {!isLoading && success && (
         <div className="result-actions">
-          {!revealed ? (
+          <CopyButton text={content} />
+          {!revealed && (
             <button className="reveal-btn" onClick={() => setRevealed(true)}>
               Click to reveal
             </button>
-          ) : (
-            <CopyButton text={content} onCopied={() => setRevealed(true)} />
           )}
         </div>
       )}
