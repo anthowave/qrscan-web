@@ -1,6 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import './ResultBox.css';
 
+function extractOtpSecret(text) {
+  if (!text || typeof text !== 'string') return null;
+  const trimmed = text.trim();
+  if (!/^otpauth:\/\/totp\//i.test(trimmed)) return null;
+  try {
+    const url = new URL(trimmed);
+    return url.searchParams.get('secret');
+  } catch {
+    // Fallback: regex extraction for malformed but parseable otpauth URLs
+    const match = trimmed.match(/[?&]secret=([^&]+)/i);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+}
+
 function detectContentType(text) {
   if (!text || typeof text !== 'string') return null;
 
@@ -63,6 +77,7 @@ export default function ResultBox({ visible, success, content, isLoading }) {
   }, [content, visible, success, isLoading]);
 
   const insight = useMemo(() => detectContentType(content), [content]);
+  const otpSecret = useMemo(() => extractOtpSecret(content), [content]);
 
   if (!visible) return null;
 
@@ -110,7 +125,8 @@ export default function ResultBox({ visible, success, content, isLoading }) {
 
       {!isLoading && success && (
         <div className="result-actions">
-          <CopyButton text={content} />
+          <CopyButton text={otpSecret || content} />
+          {otpSecret && <span className="otp-hint">Copies SECRET only</span>}
         </div>
       )}
     </div>
