@@ -44,6 +44,7 @@ src/
 - ResultBox resets revealed=false on new content via useEffect dependency on content
 - Eye icon toggle uses position: absolute; inset: 0 overlay with pointer-events: none
 - detectContentType() in ResultBox.jsx analyzes decoded text via regex heuristics and returns a human-readable label
+- extractOtpSecret() in ResultBox.jsx parses the `secret` query param from otpauth://totp/ URLs; when detected, Copy button copies only the secret value and an "otp-hint" badge appears ("Copies SECRET only")
 - Insight pill rendered inside result-header flex row, pushed right via margin-left: auto, hidden when content is revealed
 - PWA `display: standalone` — opens in dedicated window, Alt+Tab-able like native app
 - Global document paste listener in App.jsx — paste anywhere, not just inside paste zone

@@ -32,6 +32,8 @@ A privacy-first QR code scanner PWA. Decode QR codes from your clipboard, image 
 
 **One-click copy.** The copy button is always visible, even while content is blurred. Copy without ever revealing.
 
+**OTP secret auto-extraction.** When a 2FA setup code (TOTP) is detected, Copy extracts only the secret key — not the full URL. A subtle "Copies SECRET only" hint confirms what's happening. No manual parsing required.
+
 ### Installable as a native app
 
 Install to your device as a Progressive Web App. Opens in its own window, appears in your app drawer and Alt+Tab switcher, and works offline.
